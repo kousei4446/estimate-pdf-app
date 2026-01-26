@@ -1,0 +1,126 @@
+﻿openapi: 3.0.3
+info:
+  title: Estimate PDF API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+  /api/estimate/pdf:
+    post:
+      summary: Generate estimate PDF
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstimatePayload'
+      responses:
+        '200':
+          description: PDF binary
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '500':
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+components:
+  schemas:
+    EstimateItem:
+      type: object
+      properties:
+        name:
+          type: string
+        unitPrice:
+          oneOf:
+            - type: number
+            - type: string
+        quantity:
+          oneOf:
+            - type: number
+            - type: string
+        unit:
+          type: string
+        spec:
+          type: string
+    EstimatePayload:
+      type: object
+      properties:
+        customer:
+          type: string
+        date:
+          type: string
+          example: '2026-01-24'
+        taxRate:
+          oneOf:
+            - type: number
+            - type: string
+        taxRounding:
+          type: string
+          enum: [round, floor, ceil]
+        estimateTotal:
+          oneOf:
+            - type: number
+            - type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EstimateItem'
+        projectName:
+          type: string
+        projectPlace:
+          type: string
+        validity:
+          type: string
+        payment:
+          type: string
+        issuerTitle:
+          type: string
+        issuerName:
+          type: string
+        issuerAddr:
+          type: string
+        issuerTel:
+          type: string
+        issuerMobile:
+          type: string
+        company:
+          type: string
+        companyMain:
+          type: string
+        postId:
+          type: string
+        address:
+          type: string
+        tel:
+          type: string
+        phone:
+          type: string
+        showStamp:
+          type: boolean
+        stampImageDataUrl:
+          type: string
+        staffImageDataUrl:
+          type: string
+        creatorImageDataUrl:
+          type: string

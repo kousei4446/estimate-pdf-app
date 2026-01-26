@@ -1,0 +1,33 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif; background: #f6f7fb; color: #111; }
+.container { max-width: 980px; margin: 32px auto; padding: 0 16px 40px; }
+header { margin-bottom: 16px; }
+h1 { margin: 0 0 8px; font-size: 22px; }
+h2 { margin: 0; font-size: 16px; }
+.muted { color: #555; font-size: 13px; }
+.card { background: #fff; border: 1px solid #e6e7ee; border-radius: 12px; padding: 16px; margin: 14px 0; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+input, select { padding: 10px; border: 1px solid #d7d9e3; border-radius: 10px; font-size: 14px; }
+input:focus, select:focus { outline: 2px solid rgba(70, 95, 255, 0.25); border-color: #465fff; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 12px; }
+.row { display: flex; gap: 12px; align-items: center; }
+.between { justify-content: space-between; }
+.end { justify-content: flex-end; margin-top: 12px; }
+button { border: 1px solid #d7d9e3; background: #fff; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+button:hover { background: #f0f2ff; }
+button.primary { background: #465fff; color: #fff; border-color: #465fff; }
+button.primary:hover { filter: brightness(0.96); }
+.tableWrap { overflow: auto; border: 1px solid #e6e7ee; border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; min-width: 900px; }
+th, td { border-bottom: 1px solid #ececf2; padding: 10px; font-size: 13px; vertical-align: top; }
+thead th { background: #fafbff; font-weight: 600; }
+td input { width: 100%; }
+td.num { text-align: right; white-space: nowrap; }
+th.num { text-align: right; }
+pre { background: #0b1020; color: #e6e8ff; padding: 12px; border-radius: 10px; overflow:auto; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; }
+.imageGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.imageCard { display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #e6e7ee; border-radius: 10px; background: #fafbff; }
+.imagePreview { width: 96px; height: 96px; border: 1px dashed #d7d9e3; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.imagePreview img { max-width: 100%; max-height: 100%; object-fit: contain; }

@@ -1,0 +1,24 @@
+{
+    "name":  "estimate-pdf-backend",
+    "version":  "1.0.0",
+    "private":  true,
+    "type":  "module",
+    "main":  "dist/main.js",
+    "scripts":  {
+                    "dev":  "tsx watch src/main.ts",
+                    "build":  "tsc",
+                    "start":  "node dist/main.js"
+                },
+    "dependencies":  {
+                         "express":  "^4.19.2",
+                         "puppeteer":  "^22.12.1",
+                         "swagger-ui-express":  "^5.0.0"
+                     },
+    "devDependencies":  {
+                            "@types/express":  "^4.17.22",
+                            "@types/node":  "^20.11.30",
+                            "@types/swagger-ui-express":  "^4.1.6",
+                            "tsx":  "^4.19.2",
+                            "typescript":  "^5.4.5"
+                        }
+}
