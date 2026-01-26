@@ -98,28 +98,50 @@ function collectPayload() {
 
 async function generatePdf() {
   const payload = collectPayload();
+  const overlay = $("loadingOverlay");
+  const generateButton = $("generate");
 
-  const res = await fetch("/api/estimate/pdf", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
+  const setLoading = (isLoading) => {
+    if (overlay) {
+      overlay.classList.toggle("is-visible", isLoading);
+      overlay.setAttribute("aria-hidden", isLoading ? "false" : "true");
+    }
+    if (generateButton) {
+      generateButton.disabled = isLoading;
+      generateButton.setAttribute("aria-busy", isLoading ? "true" : "false");
+    }
+    document.body.style.overflow = isLoading ? "hidden" : "";
+  };
 
-  if (!res.ok) {
-    const t = await res.text();
-    alert("エラー: " + t);
-    return;
+  setLoading(true);
+
+  try {
+    const res = await fetch("/api/estimate/pdf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const t = await res.text();
+      throw new Error(t || "Request failed.");
+    }
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "御見積書.pdf";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    alert("Error: " + message);
+  } finally {
+    setLoading(false);
   }
-
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "estimate.pdf";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function updateCurlExample() {

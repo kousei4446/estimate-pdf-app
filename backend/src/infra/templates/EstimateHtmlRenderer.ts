@@ -38,7 +38,7 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
     const validity = escapeHtml(payload.validity || "1??");
     const payment = escapeHtml(payload.payment || "????");
 
-    const MAX_ROWS = 8;
+    const MAX_ROWS = 4;
     const items = computed.items.slice(0, MAX_ROWS);
     const emptyCount = Math.max(0, MAX_ROWS - items.length);
     const renderImage = (dataUrl: string | undefined, alt: string, className?: string) => {
@@ -173,6 +173,7 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
     font-size: 14pt;
     font-weight: 600;
     width: 30%;
+    margin: 0 0 2mm 0;
   }
 
 
@@ -460,8 +461,8 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
               <div class="issuer-subject">${projectName || "&nbsp;"}</div>
               <div class="issuer-meta">${companyMain || ""}</div>
               <div class="issuer-name">${company || "&nbsp;"}</div>
-              <div class="issuer-meta">${addressLine || ""}</div>
-              <div class="issuer-meta">${phoneLine || ""}</div>
+              <div class="issuer-meta">〒${addressLine || ""}</div>
+              <div class="issuer-meta">TEL・FAX${phoneLine || ""}</div>
             </div>
 
             <div class="seal-space">
