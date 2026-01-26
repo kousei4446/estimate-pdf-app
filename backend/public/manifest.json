@@ -1,0 +1,16 @@
+{
+  "name": "Estimate PDF",
+  "short_name": "Estimate PDF",
+  "description": "Estimate PDF generator",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/image.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
+}
