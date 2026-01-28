@@ -12,6 +12,25 @@ export const createApp = () => {
   const app = express();
   app.use(express.json({ limit: "1mb" }));
 
+  const authUser = process.env.BASIC_AUTH_USER;
+  const authPass = process.env.BASIC_AUTH_PASS;
+  if (authUser && authPass) {
+    app.use((req, res, next) => {
+      const authHeader = req.headers.authorization || "";
+      if (!authHeader.startsWith("Basic ")) {
+        res.setHeader("WWW-Authenticate", 'Basic realm="Estimate PDF"');
+        return res.status(401).send("Authentication required.");
+      }
+      const decoded = Buffer.from(authHeader.slice(6), "base64").toString("utf8");
+      const [user, pass] = decoded.split(":");
+      if (user !== authUser || pass !== authPass) {
+        res.setHeader("WWW-Authenticate", 'Basic realm="Estimate PDF"');
+        return res.status(401).send("Invalid credentials.");
+      }
+      return next();
+    });
+  }
+
   const publicDir = path.resolve(process.cwd(), "public");
   app.use(express.static(publicDir));
 

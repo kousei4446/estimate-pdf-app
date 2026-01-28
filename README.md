@@ -74,6 +74,13 @@ curl -X POST http://localhost:3000/api/estimate/pdf \
 - `DEFAULT_STAMP_DATA_URL`（任意: 角印などのデフォルト画像 Data URL）
 - `DEFAULT_STAFF_STAMP_DATA_URL`（任意: 担当者印のデフォルト画像 Data URL）
 - `DEFAULT_CREATOR_STAMP_DATA_URL`（任意: 作成者印のデフォルト画像 Data URL）
+- `DEFAULT_COMPANY_MAIN`（任意: 会社名のデフォルト）
+- `DEFAULT_COMPANY`（任意: 会社主名のデフォルト）
+- `DEFAULT_POST_ID`（任意: 郵便番号のデフォルト）
+- `DEFAULT_ADDRESS`（任意: 住所のデフォルト）
+- `DEFAULT_TEL`（任意: TEL・FAX のデフォルト）
+- `BASIC_AUTH_USER`（任意: Basic認証ユーザー）
+- `BASIC_AUTH_PASS`（任意: Basic認証パスワード）
 
 ### デフォルト印鑑の設定例（Data URL）
 ```bash
