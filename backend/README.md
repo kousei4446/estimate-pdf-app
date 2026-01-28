@@ -54,3 +54,21 @@ npm start
 
 - `PORT`（デフォルト: `3000`）
 - `PUPPETEER_EXECUTABLE_PATH`（任意: Chromium のパス指定）
+- `FIREBASE_PROJECT_ID`（任意: Firestore からデフォルト印鑑を取得する場合）
+- `FIREBASE_CLIENT_EMAIL`（任意）
+- `FIREBASE_PRIVATE_KEY`（任意: `\n` を含む文字列で設定）
+- `FIRESTORE_STAMP_COLLECTION`（任意: 既定 `stamp_img`）
+- `FIRESTORE_STAMP_FIELD`（任意: 既定 `url`）
+
+## Firestore 連携（デフォルト印鑑）
+
+Firestore に Data URL を保存し、PDF 生成やUI表示で利用できます。
+
+- コレクション: `stamp_img`（`FIRESTORE_STAMP_COLLECTION` で変更可）
+- ドキュメントID:
+  - `DEFAULT_STAMP_DATA_URL`（任意）
+  - `DEFAULT_STAFF_STAMP_DATA_URL`
+  - `DEFAULT_CREATOR_STAMP_DATA_URL`
+- フィールド名: `url`（`FIRESTORE_STAMP_FIELD` で変更可）
+
+Firestore が未設定の場合は環境変数の Data URL を使います。
