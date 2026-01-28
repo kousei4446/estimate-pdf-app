@@ -158,24 +158,36 @@ function updateCurlExample() {
   --output estimate.pdf`;
 }
 
-async function loadDefaultImage(imageId, previewId, imageDataUrl) {
+async function loadUiDefaults() {
   try {
-    const res = await fetch(imageDataUrl);
+    const res = await fetch("/api/ui-defaults");
     if (!res.ok) return;
-    const blob = await res.blob();
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = typeof reader.result === "string" ? reader.result : "";
-      if (imageId === "staffImage") {
-        staffImageDataUrl = dataUrl;
-      } else if (imageId === "creatorImage") {
-        creatorImageDataUrl = dataUrl;
-      }
-      setPreview($(previewId), dataUrl, imageId === "staffImage" ? "担当者" : "作成者");
-    };
-    reader.readAsDataURL(blob);
+    const data = await res.json();
+    if (data.companyMain && !$("company_main").value) $("company_main").value = data.companyMain;
+    if (data.company && !$("company").value) $("company").value = data.company;
+    if (data.postId && !$("post_id").value) $("post_id").value = data.postId;
+    if (data.address && !$("adres").value) $("adres").value = data.address;
+    if (data.tel && !$("tel").value) $("tel").value = data.tel;
   } catch (err) {
-    // Ignore errors when loading default image
+    // Ignore errors when loading defaults
+  }
+}
+
+async function loadDefaultImages() {
+  try {
+    const res = await fetch("/api/ui-default-images");
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.staff && !staffImageDataUrl) {
+      staffImageDataUrl = data.staff;
+      setPreview($("staffPreview"), data.staff, "担当者");
+    }
+    if (data.creator && !creatorImageDataUrl) {
+      creatorImageDataUrl = data.creator;
+      setPreview($("creatorPreview"), data.creator, "作成者");
+    }
+  } catch (err) {
+    // Ignore errors when loading default images
   }
 }
 
@@ -193,9 +205,8 @@ function main() {
   const staffPreview = $("staffPreview");
   const creatorPreview = $("creatorPreview");
 
-  // Load default images
-  loadDefaultImage("staffImage", "staffPreview", "./private_stamp.png");
-  loadDefaultImage("creatorImage", "creatorPreview", "./company_stamp.png");
+  loadUiDefaults();
+  loadDefaultImages();
 
   staffInput.addEventListener("change", () => {
     readImageFile(

@@ -71,8 +71,17 @@ curl -X POST http://localhost:3000/api/estimate/pdf \
 - `backend/src/main.ts`：起動エントリ
 
 ## 環境変数
-- `PORT`（デフォルト: `3000`）
-- `PUPPETEER_EXECUTABLE_PATH`（任意: Chromium のパス指定）
+- `DEFAULT_STAMP_DATA_URL`（任意: 角印などのデフォルト画像 Data URL）
+- `DEFAULT_STAFF_STAMP_DATA_URL`（任意: 担当者印のデフォルト画像 Data URL）
+- `DEFAULT_CREATOR_STAMP_DATA_URL`（任意: 作成者印のデフォルト画像 Data URL）
+
+### デフォルト印鑑の設定例（Data URL）
+```bash
+# 例: PNG を Data URL にして環境変数へ（macOS/Linux）
+STAMP_B64=$(base64 -i path/to/stamp.png | tr -d '\n')
+export DEFAULT_STAFF_STAMP_DATA_URL="data:image/png;base64,${STAMP_B64}"
+export DEFAULT_CREATOR_STAMP_DATA_URL="data:image/png;base64,${STAMP_B64}"
+```
 
 ## その他
 - ルート直下の `index.html` と `estimate.pdf` はサンプル/旧資産です。

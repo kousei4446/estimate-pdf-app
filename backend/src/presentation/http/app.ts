@@ -15,6 +15,23 @@ export const createApp = () => {
   const publicDir = path.resolve(process.cwd(), "public");
   app.use(express.static(publicDir));
 
+  app.get("/api/ui-defaults", (_req, res) => {
+    res.json({
+      companyMain: process.env.DEFAULT_COMPANY_MAIN || "",
+      company: process.env.DEFAULT_COMPANY || "",
+      postId: process.env.DEFAULT_POST_ID || "",
+      address: process.env.DEFAULT_ADDRESS || "",
+      tel: process.env.DEFAULT_TEL || "",
+    });
+  });
+
+  app.get("/api/ui-default-images", (_req, res) => {
+    res.json({
+      staff: process.env.DEFAULT_STAFF_STAMP_DATA_URL || "",
+      creator: process.env.DEFAULT_CREATOR_STAMP_DATA_URL || "",
+    });
+  });
+
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   const openapiPath = path.resolve(__dirname, "../../../openapi.yaml");
