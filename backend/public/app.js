@@ -47,10 +47,10 @@ function newRow(data = {}) {
 
   tr.innerHTML = `
     <td><input class="name" placeholder="例）足場仮設工事" value="${data.name ?? ""}"></td>
-    <td class="num"><input class="unitPrice" type="number" step="1" value="${data.unitPrice ?? ""}" placeholder="0" disabled></td>
-    <td class="num"><input class="quantity" type="number" step="0.01" value="${data.quantity ?? ""}" placeholder="0" disabled></td>
-    <td><input class="unit" placeholder="例）式" value="${data.unit ?? ""}"></td>
-    <td><input class="spec" placeholder="例）一般" value="${data.spec ?? ""}"></td>
+    <td class="num"><input class="unitPrice" type="number" step="1" value="${data.unitPrice ?? ""}" placeholder="0"></td>
+    <td class="num"><input class="quantity" type="number" step="0.01" value="${data.quantity ?? ""}" placeholder="0"></td>
+    <td><input class="unit" placeholder="" value="${data.unit ?? ""}"></td>
+    <td><input class="spec" placeholder="165" value="${data.spec ?? ""}"></td>
     <td class="num"><input class="amountInput" type="number" step="1" value="${data.amount ?? ""}" placeholder="0"></td>
     <td class="num"><button type="button" class="del">削除</button></td>
   `;
@@ -64,8 +64,8 @@ function newRow(data = {}) {
 function collectPayload() {
   const items = [...$("itemsTable").querySelector("tbody").querySelectorAll("tr")].map((tr) => ({
     name: tr.querySelector(".name").value,
-    unitPrice: 0,
-    quantity: 0,
+    unitPrice: tr.querySelector(".unitPrice").value,
+    quantity: tr.querySelector(".quantity").value,
     amount: tr.querySelector(".amountInput").value,
     unit: tr.querySelector(".unit").value,
     spec: tr.querySelector(".spec").value
@@ -90,6 +90,10 @@ function collectPayload() {
 
   const estimateTotal = $("estimateTotal").value;
   if (estimateTotal !== "") payload.estimateTotal = Number(estimateTotal);
+  const subtotal = $("subtotal") ? $("subtotal").value : "";
+  if (subtotal !== "") payload.subtotal = Number(subtotal);
+  const tax = $("tax") ? $("tax").value : "";
+  if (tax !== "") payload.tax = Number(tax);
   if (staffImageDataUrl) payload.staffImageDataUrl = staffImageDataUrl;
   if (creatorImageDataUrl) payload.creatorImageDataUrl = creatorImageDataUrl;
 
@@ -154,11 +158,32 @@ function updateCurlExample() {
   --output estimate.pdf`;
 }
 
+async function loadDefaultImage(imageId, previewId, imageDataUrl) {
+  try {
+    const res = await fetch(imageDataUrl);
+    if (!res.ok) return;
+    const blob = await res.blob();
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = typeof reader.result === "string" ? reader.result : "";
+      if (imageId === "staffImage") {
+        staffImageDataUrl = dataUrl;
+      } else if (imageId === "creatorImage") {
+        creatorImageDataUrl = dataUrl;
+      }
+      setPreview($(previewId), dataUrl, imageId === "staffImage" ? "担当者" : "作成者");
+    };
+    reader.readAsDataURL(blob);
+  } catch (err) {
+    // Ignore errors when loading default image
+  }
+}
+
 function main() {
   $("date").value = todayISO();
 
   const tbody = $("itemsTable").querySelector("tbody");
-  tbody.appendChild(newRow({ name: "○○様邸足場工事", amount: 99000, unit: 165, spec: "" }));
+  tbody.appendChild(newRow({ name: "", amount: 0, unit: 0, spec: "" }));
 
   $("addRow").addEventListener("click", () => tbody.appendChild(newRow()));
   $("generate").addEventListener("click", generatePdf);
@@ -167,6 +192,10 @@ function main() {
   const creatorInput = $("creatorImage");
   const staffPreview = $("staffPreview");
   const creatorPreview = $("creatorPreview");
+
+  // Load default images
+  loadDefaultImage("staffImage", "staffPreview", "./private_stamp.png");
+  loadDefaultImage("creatorImage", "creatorPreview", "./company_stamp.png");
 
   staffInput.addEventListener("change", () => {
     readImageFile(

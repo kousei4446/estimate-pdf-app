@@ -15,6 +15,8 @@ export interface EstimatePayload {
   taxRate?: number | string;
   taxRounding?: TaxRounding;
   estimateTotal?: number | string;
+  subtotal?: number | string;
+  tax?: number | string;
   items?: EstimateItem[];
   projectName?: string;
   projectPlace?: string;

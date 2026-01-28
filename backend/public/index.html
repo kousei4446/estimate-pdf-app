@@ -229,15 +229,15 @@
 
     /* ▼▼▼ 列ごとの幅を指定してズレを防止 ▼▼▼ */
     th:nth-child(1) { width: 25%; }  /* 項目 (一番広く) */
-    th:nth-child(2) { width: 15%; }  /* 規格 */
-    th:nth-child(3) { width: 12%; }  /* 単価 */
-    th:nth-child(4) { width: 10%; }  /* 数量 */
-    th:nth-child(5) { width: 12%; }  /* 単位 */
+    th:nth-child(2) { width: 12%; }  /* 単価 */
+    th:nth-child(3) { width: 10%; }  /* 数量 */
+    th:nth-child(4) { width: 12%; }  /* 単位 */
+    th:nth-child(5) { width: 15%; }  /* 規格 */
     th:nth-child(6) { width: 15%; }  /* 金額 */
     th:nth-child(7) { width: 70px; } /* 削除ボタン (固定幅) */
 
     th.num, td.num {
-      text-align: right;
+      text-align: left;
     }
 
     /* inputがセルからはみ出ないように調整 */
@@ -326,7 +326,7 @@
       <div class="grid2">
         <label>
           宛名
-          <input id="customer" placeholder="例）山田" value="中村塗装"/>
+          <input id="customer" placeholder="例）〇〇塗装" />
         </label>
         <label>
           日付
@@ -336,9 +336,40 @@
 
       <div class="grid3">
         <label>
-          お見積り金額 <span style="font-size:0.8em; font-weight:normal; color:#666;">(空なら税込合計)</span>
-          <input id="estimateTotal" type="number" step="1" placeholder="空なら自動" value="11818"/>
+          御見積金額
+          <input id="estimateTotal" type="number" step="1" placeholder="1080"/>
         </label>
+        <label>
+          小計
+          <input id="subtotal" type="number" step="1" placeholder="1000"/>
+        </label>
+        <label>
+          消費税
+          <input id="tax" type="number" step="1" placeholder="80"/>
+        </label>
+      </div>
+    </section>
+    <section class="card">
+      <div class="row between">
+        <h2>明細</h2>
+        <button id="addRow" type="button">＋ 行を追加</button>
+      </div>
+
+      <div class="tableWrap">
+        <table id="itemsTable">
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>規格</th>
+              <th class="num">単価</th>
+              <th class="num">数量</th>
+              <th>単位(m<sup>2</sup>)</th>
+              <th class="num">金額</th>
+              <th class="col-del">削除</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </section>
 
@@ -346,7 +377,7 @@
       <div class="grid2">
         <label>
           会社名
-          <input id="company_main"  placeholder="例）○○会社" value="仮説足場工事一式"/>
+          <input id="company_main"  placeholder="例）○○会社" value="足場工事一式"/>
         </label>
         <label>
           会社主名
@@ -357,20 +388,20 @@
       <div class="grid3">
         <label>
           郵便番号
-          <input id="post_id"/>
+          <input id="post_id" value="5900505"/>
         </label>
         <label>
           住所
-          <input id="adres"/>
+          <input id="adres" value="泉南市信達大苗代７０１ー３４"/>
         </label>
         <label>
           TEL・FAX
-          <input id="tel"/>
+          <input id="tel" value="09036150324"/>
         </label>
-        <label>
+        <!-- <label>
           携帯
           <input id="phone"/>
-        </label>
+        </label> -->
       </div>
     </section>
 
@@ -394,35 +425,11 @@
           <button id="clearCreatorImage" type="button">画像をクリア</button>
         </div>
       </div>
-    </section>
-
-    <section class="card">
-      <div class="row between">
-        <h2>明細</h2>
-        <button id="addRow" type="button">＋ 行を追加</button>
-      </div>
-
-      <div class="tableWrap">
-        <table id="itemsTable">
-          <thead>
-            <tr>
-              <th>項目</th>
-              <th>規格</th>
-              <th class="num">単価</th>
-              <th class="num">数量</th>
-              <th>単位(m<sup>2</sup>)</th>
-              <th class="num">金額</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
       <div class="row end">
         <button id="generate" type="button" class="primary">PDFを生成</button>
       </div>
     </section>
+
   </div>
 
   <script src="/app.js"></script>

@@ -20,7 +20,13 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
 
     const overrideTotal = Number.isFinite(Number(payload.estimateTotal))
       ? Number(payload.estimateTotal)
-      : computed.total;
+      : undefined;
+    const overrideSubtotal = Number.isFinite(Number(payload.subtotal))
+      ? Number(payload.subtotal)
+      : undefined;
+    const overrideTax = Number.isFinite(Number(payload.tax))
+      ? Number(payload.tax)
+      : undefined;
 
     const company = escapeHtml(payload.company || payload.issuerName || "");
     const companyMain = escapeHtml(payload.companyMain || payload.issuerTitle || "");
@@ -38,7 +44,7 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
     const validity = escapeHtml(payload.validity || "1??");
     const payment = escapeHtml(payload.payment || "????");
 
-    const MAX_ROWS = 4;
+    const MAX_ROWS = 8;
     const items = computed.items.slice(0, MAX_ROWS);
     const emptyCount = Math.max(0, MAX_ROWS - items.length);
     const renderImage = (dataUrl: string | undefined, alt: string, className?: string) => {
@@ -47,6 +53,11 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
       return `<img${classAttr} src="${dataUrl}" alt="${alt}" />`;
     };
 
+    const formatNumber = (value: number) =>
+      new Intl.NumberFormat("ja-JP", { maximumFractionDigits: 4 }).format(value);
+    const formatMaybeNumber = (value: string) =>
+      /^-?\d+(\.\d+)?$/.test(value) ? formatNumber(Number(value)) : value;
+
     const itemRows =
       items
         .map((item) => {
@@ -54,11 +65,11 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
           return `
             <tr class="row">
               <td class="col-item">${item.name}</td>
+              <td class="col-unitprice num">${item.unitPrice ? `${yen(item.unitPrice)}` : ""}</td>
+              <td class="col-qty center">${item.quantity ? formatNumber(item.quantity) : ""}</td>
+              <td class="col-unit center">${item.unit ? formatMaybeNumber(item.unit) : ""}</td>
               <td class="col-spec center">${item.spec || ""}</td>
-              <td class="col-unitprice num">${item.unitPrice ? `&yen;${yen(item.unitPrice)}` : ""}</td>
-              <td class="col-qty center">${item.quantity ? String(item.quantity) : ""}</td>
-              <td class="col-unit center">${item.unit || ""}</td>
-              <td class="col-amount ${amountClass}">${item.amount ? `&yen;${yen(item.amount)}` : ""}</td>
+              <td class="col-amount ${amountClass}">${item.amount ? `${yen(item.amount)}` : ""}</td>
             </tr>
           `;
         })
@@ -78,9 +89,13 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
         )
         .join("");
 
-    const totalText = `&yen;${yen(overrideTotal)}`;
-    const subtotalText = `&yen;${yen(computed.subtotal)}`;
-    const taxText = `&yen;${yen(computed.tax)}`;
+    const subtotalValue = overrideSubtotal ?? computed.subtotal;
+    const taxValue = overrideTax ?? computed.tax;
+    const totalValue = overrideTotal ?? subtotalValue + taxValue;
+
+    const totalText = `&yen;${yen(totalValue)}`;
+    const subtotalText = `&yen;${yen(subtotalValue)}`;
+    const taxText = `&yen;${yen(taxValue)}`;
 
     return `
     <!doctype html>
@@ -102,8 +117,8 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
     margin: 0;
     font-family: "Noto Sans CJK JP", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
     color:#000;
-    font-size: 10.5pt;
-    line-height: 1.25;
+    font-size: 9.5pt;
+    line-height: 1.2;
   }
 
   .page{ width:100%; }
@@ -111,7 +126,8 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
   /* ===== Header ===== */
   .header{
     position: relative;
-    padding-top: 1mm;
+    padding-top: 0.5mm;
+    padding-bottom: 1.5mm;
   }
 
   .date-wrap{
@@ -122,7 +138,7 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
   }
   .date{ font-size: 9pt; }
   .date-rule{
-    margin-top: 2mm;
+    margin-top: 1.5mm;
     width: 67mm;           /* 参考PDFの右上線に寄せる */
     border-top: var(--b);
     margin-left: auto;
@@ -131,22 +147,22 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
   .title{
     text-align:center;
     font-family: "Noto Serif CJK JP","Noto Serif JP","MS Mincho",serif;
-    font-size: 16pt;
+    font-size: 14.5pt;
     letter-spacing: 0.35em;
     margin: 0;
   }
   .title-rule{
     width: 62mm;           /* 参考PDFの中央下線に寄せる */
     border-top: var(--b);
-    margin: 2mm auto 0;
+    margin: 1.5mm auto 0;
   }
 
   .honorific{
     text-align:center;
     font-family: "Noto Serif CJK JP","Noto Serif JP","MS Mincho",serif;
-    font-size: 14pt;
+    font-size: 13pt;
     font-weight: 600;
-    margin-top: 2mm;
+    margin-top: 1.5mm;
   }
 
   /* ===== Top layout ===== */
@@ -154,11 +170,11 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
     display:flex;
     justify-content: space-between; /* 左右を離して中央に余白を作る */
     align-items:flex-start;
-    margin-top: 2mm;
+    margin-top: 1.5mm;
   }
 
   /* 参考PDFに合わせて、左右を固定幅にして中央余白を確保 */
-  .left-col{ width: 30%; }
+  .left-col{ width: 35%; }
   .right-col{ width: 40%; }
 
   /* 宛名（左上に配置） */
@@ -170,10 +186,9 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
   }
 
   .ontyu{
-    font-size: 14pt;
+    font-size: 12pt;
     font-weight: 600;
-    width: 30%;
-    margin: 0 0 2mm 0;
+    width: 25%;
   }
 
 
@@ -185,26 +200,26 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
   .amount-box td{
     /* border: var(--b); */
     border-bottom: 2px solid #000;
-    padding: 2mm 2mm;
+    padding: 1.5mm 2mm;
     text-align:center;
     vertical-align: middle;
     font-weight: 500;
   }
-  .amount-box th{ width: 32mm; }
+  .amount-box th{ width: 24mm; }
   .amount-box .big{
     font-size: 12pt;
     font-weight: 700;
   }
 
   /* amount → info の間（参考PDFの空きに寄せる） */
-  .gap-lg{ height: 8mm; }
+  .gap-lg{ height: 6mm; }
 
   /* ===== Info table (左中 工事情報) ===== */
 
   .info-table th,
   .info-table td{
     border-bottom: 2px solid #000;
-    padding: 2mm 2mm;
+    padding: 1.5mm 2mm;
     text-align:center;
     vertical-align: middle;
     font-weight: 500;
@@ -214,8 +229,8 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
   /* ===== Issuer box (右上 発行者枠＋角印) ===== */
   .issuer-box{
     border: var(--b);
-    padding: 3mm;
-    height: 38mm; /* 参考PDFの高さ感 */
+    padding: 2.5mm;
+    height: 34mm; /* 参考PDFの高さ感 */
   }
   .issuer-top{
     display:flex;
@@ -226,38 +241,38 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
   }
   .issuer-subject{
     font-weight: 500;
-    margin-bottom: 1mm;
+    margin-bottom: 0.6mm;
   }
   .issuer-meta{
-    font-size: 8.5pt;
-    margin-top: 1mm;
+    font-size: 8pt;
+    margin-top: 0.6mm;
   }
   .issuer-name{
-    font-size: 16pt;
+    font-size: 14.5pt;
     font-weight: 800;
-    margin: 1mm 0;
+    margin: 0.8mm 0;
     letter-spacing: 0.06em;
   }
 
   /* 角印スペース（枠線は付けない：参考PDFの見え方に寄せる） */
   .seal-space{
-    width: 32mm;
-    height: 32mm;
+    width: 24mm;
+    height: 24mm;
     flex: 0 0 auto;
     display:flex;
     align-items:flex-start;
     justify-content:flex-end;
   }
   .seal-space img{
-    max-width: 32mm;
-    max-height: 32mm;
+    max-width: 24mm;
+    max-height: 24mm;
     object-fit: contain;
     display:block;
   }
 
   /* ===== Approval (右中 承認枠) ===== */
   .approval{
-    margin-top: 6mm;
+    margin-top: 4mm;
   }
   .approval table{
     width: 78mm;           /* 参考PDF：右寄せで小さめ */
@@ -269,23 +284,23 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
     border: var(--b);
     text-align:center;
     vertical-align: middle;
-    padding: 1.5mm 0;
+    padding: 1.2mm 0;
     font-weight: 600;
   }
   .approval td{
-    height: 20mm;
+    height: 17mm;
     font-weight: 500;
   }
   .approval-image{
     max-width: 100%;
-    max-height: 18mm;
+    max-height: 15mm;
     object-fit: contain;
     display:block;
     margin: 0 auto;
   }
 
   /* ===== Items table (明細) ===== */
-  .items-wrap{ margin-top: 6mm; }
+  .items-wrap{ margin-top: 4mm; }
 
   .items{
     border: var(--b);
@@ -294,7 +309,7 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
   .items th,
   .items td{
     border: var(--b);
-    padding: 1.6mm 2mm;
+    padding: 1.2mm 2mm;
     text-align: center;     /* 参考PDFは中央寄り */
     vertical-align: middle;
     font-weight: 500;
@@ -303,7 +318,7 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
     font-weight: 700;
   }
   .items tbody td{
-    height: 9mm;           /* 行の高さ感 */
+    height: 7.5mm;           /* 行の高さ感 */
   }
 
   .col-item{ width: 120mm; }
@@ -324,7 +339,7 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
   .bottom{
     display:flex;
     align-items: stretch;
-    margin-top: 3mm;
+    margin-top: 2mm;
   }
 
   .remarks{
@@ -337,16 +352,16 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
     border-bottom: var(--b);
     text-align:center;
     font-weight: 700;
-    padding: 1.5mm 0;
+    padding: 1.2mm 0;
   }
   .remarks-body{
-    padding: 1mm 2mm 2mm;
-    font-size: 7.2pt;
-    line-height: 1.25;
+    padding: 0.8mm 1.8mm 1.6mm;
+    font-size: 6.7pt;
+    line-height: 1.2;
     flex: 1;
   }
   .remarks-line{
-    padding: 1mm 0;
+    padding: 0.8mm 0;
     border-bottom: var(--b-thin);
   }
 
@@ -375,7 +390,7 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
     border-collapse: collapse;
   }
   .taxin td{
-    padding: 3mm 3mm;
+    padding: 2.4mm 2.4mm;
     font-weight: 700;
     border: none;
   }
@@ -420,7 +435,7 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
         <table class="amount-box">
           <tr>
             <th style="border-right: 2px #000 solid;">御見積金額</th>
-            <td class="big" colspan="3">${totalText}</td>
+            <td colspan="3">${totalText}</td>
           </tr>
           <tr>
             <th style="border-right: 2px #000 solid;">小計</th>
@@ -490,8 +505,8 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
                 }
               </td>
               <td>
-                ${creatorImageDataUrl
-                  ? '<img class="approval-image" src="' + creatorImageDataUrl + '" alt="作成者" />'
+                ${staffImageDataUrl
+                  ? '<img class="approval-image" src="' + staffImageDataUrl + '" alt="作成者" />'
                   : ''
                 }
               </td>
@@ -538,7 +553,7 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
         <table class="taxin">
           <tr>
             <td class="lbl">消費税込</td>
-            <td class="val">${totalText}</td>
+            <td class="val" style = "font-weight:300;">${totalText}</td>
           </tr>
         </table>
       </div>
@@ -582,4 +597,3 @@ function formatPostalCode(raw: string) {
   }
   return raw;
 }
-
