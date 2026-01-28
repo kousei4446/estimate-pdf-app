@@ -482,7 +482,7 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
 
             <div class="seal-space">
                 ${staffImageDataUrl
-                  ? '<img class="approval-image" src="' + staffImageDataUrl + '" alt="担当者" />'
+                  ? '<img src="' + staffImageDataUrl + '" alt="担当者" />'
                   : ''
                 }
             </div>
@@ -500,13 +500,13 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
               <td></td>
               <td>
               ${creatorImageDataUrl
-                ? '<img src="' + creatorImageDataUrl + '" alt="印影" />'
+                ? '<img src="' + creatorImageDataUrl + '" alt="印影" class="approval-image" />'
                 : ''
               }
               </td>
               <td>
               ${creatorImageDataUrl
-                ? '<img src="' + creatorImageDataUrl + '" alt="印影" />'
+                ? '<img src="' + creatorImageDataUrl + '" alt="印影" class="approval-image" />'
                 : ''
               }
               </td>
