@@ -7,6 +7,7 @@ import { PuppeteerPdfGenerator } from "../../infra/pdf/PuppeteerPdfGenerator.js"
 import { GenerateEstimatePdf } from "../../application/usecases/GenerateEstimatePdf.js";
 import { EstimateController } from "./controllers/EstimateController.js";
 import { createEstimateRouter } from "./routes/estimateRoutes.js";
+import { getStampImagesFromFirestore } from "../../infra/firebase/stampImages.js";
 
 export const createApp = () => {
   const app = express();
@@ -44,10 +45,17 @@ export const createApp = () => {
     });
   });
 
-  app.get("/api/ui-default-images", (_req, res) => {
+  app.get("/api/ui-default-images", async (_req, res) => {
+    const defaultsFromFirestore = await getStampImagesFromFirestore();
     res.json({
-      staff: process.env.DEFAULT_STAFF_STAMP_DATA_URL || "",
-      creator: process.env.DEFAULT_CREATOR_STAMP_DATA_URL || "",
+      staff:
+        defaultsFromFirestore?.staff ||
+        process.env.DEFAULT_STAFF_STAMP_DATA_URL ||
+        "",
+      creator:
+        defaultsFromFirestore?.creator ||
+        process.env.DEFAULT_CREATOR_STAMP_DATA_URL ||
+        "",
     });
   });
 

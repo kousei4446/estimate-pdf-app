@@ -5,4 +5,5 @@ frontend/dist/
 backend/dist/
 images/
 /index.html
+setting.json
 .env

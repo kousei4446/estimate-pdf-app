@@ -1,6 +1,7 @@
 ﻿import type { Request, Response } from "express";
 import type { EstimatePayload } from "../../../domain/entities/EstimatePayload.js";
 import { GenerateEstimatePdf } from "../../../application/usecases/GenerateEstimatePdf.js";
+import { getStampImagesFromFirestore } from "../../../infra/firebase/stampImages.js";
 
 export class EstimateController {
   constructor(private readonly generateEstimatePdf: GenerateEstimatePdf) {}
@@ -8,7 +9,7 @@ export class EstimateController {
   async createPdf(req: Request, res: Response) {
     try {
       const payload = (req.body ?? {}) as EstimatePayload;
-      const withDefaults = applyDefaultStampImages(payload);
+      const withDefaults = await applyDefaultStampImages(payload);
       const pdf = await this.generateEstimatePdf.execute(withDefaults);
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader("Content-Disposition", 'inline; filename="estimate.pdf"');
@@ -33,10 +34,17 @@ function sanitizeImageDataUrl(imageDataUrl: string | undefined) {
   return IMAGE_DATA_URL_PATTERN.test(trimmed) ? trimmed : undefined;
 }
 
-function applyDefaultStampImages(payload: EstimatePayload): EstimatePayload {
-  const defaultStamp = sanitizeImageDataUrl(process.env.DEFAULT_STAMP_DATA_URL);
-  const defaultStaff = sanitizeImageDataUrl(process.env.DEFAULT_STAFF_STAMP_DATA_URL);
-  const defaultCreator = sanitizeImageDataUrl(process.env.DEFAULT_CREATOR_STAMP_DATA_URL);
+async function applyDefaultStampImages(payload: EstimatePayload): Promise<EstimatePayload> {
+  const defaultsFromFirestore = await getStampImagesFromFirestore();
+  const defaultStamp = sanitizeImageDataUrl(
+    defaultsFromFirestore?.stamp || process.env.DEFAULT_STAMP_DATA_URL
+  );
+  const defaultStaff = sanitizeImageDataUrl(
+    defaultsFromFirestore?.staff || process.env.DEFAULT_STAFF_STAMP_DATA_URL
+  );
+  const defaultCreator = sanitizeImageDataUrl(
+    defaultsFromFirestore?.creator || process.env.DEFAULT_CREATOR_STAMP_DATA_URL
+  );
 
   return {
     ...payload,
