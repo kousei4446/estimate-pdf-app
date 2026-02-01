@@ -1,4 +1,4 @@
-const CACHE_NAME = "estimate-pdf-v1";
+const CACHE_NAME = "estimate-pdf-v2";
 const CORE_ASSETS = [
   "/",
   "/index.html",

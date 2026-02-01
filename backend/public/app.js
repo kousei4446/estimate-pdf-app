@@ -11,6 +11,72 @@ function yen(n) {
   return new Intl.NumberFormat("ja-JP").format(Math.round(v));
 }
 
+function recomputeTotals() {
+  const estimateTotal = document.getElementById("estimateTotal").value;
+  if (estimateTotal === "") {
+    window.alert("先に見積総額を入力してください。");
+    return;
+  }
+  let subtotal = Math.round((estimateTotal*10)/11);
+  let tax = estimateTotal - subtotal;
+  document.getElementById("subtotal").value = subtotal;
+  document.getElementById("tax").value = tax;
+}
+
+
+function autoCalDvide() {
+  let totalAmount = 0;
+  const tbody = $("itemsTable").querySelector("tbody");
+  let adjustRow = null;
+  for (const tr of tbody.querySelectorAll("tr")) {
+    const nameEl = tr.querySelector(".name");
+    const amountEl = tr.querySelector(".amountInput");
+    if (!amountEl) continue;
+    const nameValue = (nameEl ? nameEl.value : "").trim();
+    if (nameValue === "調整値引き") {
+      adjustRow = tr;
+      continue;
+    }
+    totalAmount += Number(amountEl.value) || 0;
+  }
+  const estimateTotalRaw = document.getElementById("estimateTotal").value;
+
+  if (estimateTotalRaw === "") {
+    window.alert("先に見積総額を入力してください。");
+    return;
+  }
+
+  const estimateTotal = Number(estimateTotalRaw);
+  if (!Number.isFinite(estimateTotal)) {
+    window.alert("見積総額の数値が不正です。");
+    return;
+  }
+
+  let subtotal = Math.round((estimateTotal * 10) / 11);
+
+  let diff = totalAmount - subtotal;
+
+  if (diff == 0) {
+    window.alert("調整不要です。");
+    return;
+  }
+
+  const adjustmentValue = -Math.abs(diff);
+
+  // 項目を調整値引きにして表の最後に追加
+  const tbodyEl = $("itemsTable").querySelector("tbody");
+  const adjustTr = newRow({
+    name: "調整値引き",
+    unitPrice: "",
+    quantity: "",
+    amount: adjustmentValue,
+    unit: "",
+    spec: ""
+  });
+  tbodyEl.appendChild(adjustTr);
+  
+}
+
 let staffImageDataUrl = "";
 let creatorImageDataUrl = "";
 
@@ -149,9 +215,11 @@ async function generatePdf() {
 }
 
 function updateCurlExample() {
+  const curlEl = $("curlExample");
+  if (!curlEl) return;
   const payload = collectPayload();
   const json = JSON.stringify(payload, null, 2);
-  $("curlExample").textContent =
+  curlEl.textContent =
 `curl -X POST http://localhost:3000/api/estimate/pdf \\
   -H "Content-Type: application/json" \\
   -d '${json.replaceAll("'", "'\\''")}' \\
@@ -199,6 +267,15 @@ function main() {
 
   $("addRow").addEventListener("click", () => tbody.appendChild(newRow()));
   $("generate").addEventListener("click", generatePdf);
+  $("auto_dvid").addEventListener("click", () => {
+    autoCalDvide();
+    updateCurlExample();
+  });
+
+  $("auto_calculate").addEventListener("click", () => {
+    recomputeTotals();
+    updateCurlExample();
+  });
 
   const staffInput = $("staffImage");
   const creatorInput = $("creatorImage");
@@ -250,6 +327,7 @@ function main() {
 
   document.body.addEventListener("input", () => updateCurlExample());
   updateCurlExample();
+
 }
 main();
 
