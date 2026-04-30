@@ -102,7 +102,7 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
-<title>御　見　積　書</title>
+<title>御　請　求　書</title>
 <style>
   @page { size: A4 landscape; margin: 10mm; }
 
@@ -421,7 +421,7 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
         <div class="date-rule"></div>
       </div>
 
-      <h1 class="title">御　見　積　書</h1>
+      <h1 class="title">請　求　書</h1>
       <div class="title-rule"></div>
     </div>
 

@@ -201,7 +201,7 @@ async function generatePdf() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "御見積書.pdf";
+    a.download = "請求書.pdf";
     document.body.appendChild(a);
     a.click();
     a.remove();
