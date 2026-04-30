@@ -434,7 +434,7 @@ export class EstimateHtmlRenderer implements HtmlRenderer<EstimatePayload> {
 
         <table class="amount-box">
           <tr>
-            <th style="border-right: 2px #000 solid;">御見積金額</th>
+            <th style="border-right: 2px #000 solid;">請求額</th>
             <td colspan="3">${totalText}</td>
           </tr>
           <tr>
